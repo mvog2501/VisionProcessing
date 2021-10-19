@@ -3,7 +3,7 @@ import numpy as np
 
 
 
-path = "OpenCV/resources/shapes.png"
+path = "resources/shapes.png"
 img = cv2.imread(path)
 imgContour = img.copy()
 
