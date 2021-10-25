@@ -4,7 +4,8 @@ import os
 import time
 
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
+
 
 
 
@@ -27,8 +28,9 @@ cv2.createTrackbar("Value Max","Track Bars",255,255,empty)
 cv2.createTrackbar("Number of Yellow Min","Track Bars",0,100000,empty)
 cv2.createTrackbar("Thresh Low", "Track Bars", 0 , 255, empty)
 cv2.createTrackbar("Thresh High", "Track Bars", 255 , 255, empty)
+cv2.createTrackbar("Exposure","Track Bars", -10,10, empty)
 
-
+exposure = 0
 
 
 
@@ -36,6 +38,7 @@ cv2.createTrackbar("Thresh High", "Track Bars", 255 , 255, empty)
 while(True):
       
     # Capture frames in the video
+    cap.set(cv2.CAP_PROP_EXPOSURE,-  exposure)
     ret, frame = cap.read()
 
 
@@ -55,6 +58,7 @@ while(True):
     yellowThresh = cv2.getTrackbarPos("Number of Yellow Min","Track Bars")
     BTLow = cv2.getTrackbarPos("Thresh Low", "Track Bars")
     BTHigh = cv2.getTrackbarPos("Thresh High", "Track Bars")
+    exposure = cv2.getTrackbarPos("Exposure","Track Bars")
     #print(h_min,h_max,s_min,s_max,v_min,v_max)
 
     lower = np.array([h_min,s_min,v_min])
