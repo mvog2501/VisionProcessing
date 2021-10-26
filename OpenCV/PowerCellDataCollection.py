@@ -4,7 +4,7 @@ import os
 import time
 
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 
@@ -66,6 +66,10 @@ while(True):
     frameMask = cv2.inRange(frameHSV,lower,upper)
     frameResult = cv2.bitwise_and(frame,frame,mask=frameMask)
     frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
+
+
+    #another test
+    frameThreshold = cv2.inRange(frameHSV,(h_min,s_min,v_min),(h_max,s_max,v_max))
     
     countYellow = cv2.countNonZero(frameMask)
     if countYellow > yellowThresh: #choose condition
@@ -74,9 +78,19 @@ while(True):
 
         # Crop the image to the ball using contours
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
-        contours, hierarchy = cv2.findContours(binary,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-        x, y, w, h = cv2.boundingRect(contours[0])
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),3)
+        contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        
+
+
+        if len(contours)> 0:
+            bestContour = max(contours, key = cv2.contourArea)
+            x, y, w, h = cv2.boundingRect(bestContour[0])
+            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),3)
+
+            cropFrame = frame[y:y+h,x:x+w]
+
+        
+        
 
 
     else:
@@ -94,7 +108,8 @@ while(True):
     cv2.imshow('video', frame)
     cv2.imshow("Mask",frameResult)
     cv2.imshow("Binary Image",binary)
-  
+    #cv2.imshow("Image Threshold",frameThreshold)
+    cv2.imshow("Cropped",cropFrame)
     # creating 'q' as the quit 
     # button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
