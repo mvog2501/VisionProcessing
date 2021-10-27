@@ -6,8 +6,10 @@ import time
 
 cap = cv2.VideoCapture(0)
 
+color = (255,0,255)
 
 
+i =0
 
 
 # Make trackbars
@@ -76,18 +78,25 @@ while(True):
         print("Ball Detected")
         ballInScene = True
 
+        
         # Crop the image to the ball using contours
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
+        inverted = cv2.bitwise_not(binary)
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+        cv2.drawContours(frame,contours,-1,(0,255,255),3)
+
+        
         
 
 
         if len(contours)> 0:
             bestContour = max(contours, key = cv2.contourArea)
-            x, y, w, h = cv2.boundingRect(bestContour[0])
+            
+            x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),3)
 
-            cropFrame = frame[y:y+h,x:x+w]
+            #cropFrame = frame[y:y+h,x:x+w]
 
         
         
@@ -109,7 +118,7 @@ while(True):
     cv2.imshow("Mask",frameResult)
     cv2.imshow("Binary Image",binary)
     #cv2.imshow("Image Threshold",frameThreshold)
-    cv2.imshow("Cropped",cropFrame)
+    #cv2.imshow("Cropped",cropFrame)
     # creating 'q' as the quit 
     # button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
