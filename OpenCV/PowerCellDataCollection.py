@@ -6,6 +6,10 @@ import time
 
 cap = cv2.VideoCapture(0)
 
+
+#soling error
+
+
 color = (255,0,255)
 #Cropping Width
 CW = 25
@@ -98,27 +102,27 @@ while(True):
             cv2.rectangle(frame,(x - CW,y - CW),( x + CW + w,y + CW + h ),(255,0,0),3)
 
             croppedSize = ( ( (y+CW+h )-(y-CW) ) * ( (x+CW+w)-(x-CW) ) )
-
-            if croppedSize < frameArea:
-                cropFrame = cleanFrame[ y-CW:(y+CW)+w , x-CW:(x+CW)+w ]
+            
+            #if ((y+CW+h)-(y-CW)) < frame.shape[0] and ((x+CW+w)-(x-CW)) < frame.shape[1] and cv2.contourArea(bestContour) > 100 and # make sure that no point is going over edge of image:
+            if y-CW > 0 and x-CW > 0 and y+CW+h < frame.shape[0] and x+CW+w > frame.shape[1]:
+                cropFrame = cleanFrame[ y-CW:y+CW+w , x-CW:x+CW+w ]
+                print(cv2.contourArea(bestContour))
             else:
                 print("You saved me!")
                 #banish to underdark
+                cropFrame = cv2.imread("OpenCV/resources/lambo.png")
                 
-            
-            
-
-
         else:
             o=0
             #send it to the shadow realm
-
+            cropFrame = cv2.imread("OpenCV/resources/lambo.png")
         
         
 
 
     else:
         ballInScene = False
+        cropFrame = cv2.imread("OpenCV/resources/lambo.png")
     
     
     
