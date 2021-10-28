@@ -7,11 +7,8 @@ import time
 cap = cv2.VideoCapture(0)
 
 color = (255,0,255)
-
-
-i =0
-
-
+#Cropping Width
+CW = 25
 # Make trackbars
 
 
@@ -42,6 +39,11 @@ while(True):
     # Capture frames in the video
     cap.set(cv2.CAP_PROP_EXPOSURE,-  exposure)
     ret, frame = cap.read()
+    cleanFrame = frame.copy()
+
+    # Get image area
+    frameArea = frame.shape[0] * frame.shape[1]
+    
 
 
 
@@ -75,7 +77,7 @@ while(True):
     
     countYellow = cv2.countNonZero(frameMask)
     if countYellow > yellowThresh: #choose condition
-        print("Ball Detected")
+        #print("Ball Detected")
         ballInScene = True
 
         
@@ -83,20 +85,33 @@ while(True):
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
         inverted = cv2.bitwise_not(binary)
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+                
 
         cv2.drawContours(frame,contours,-1,(0,255,255),3)
-
-        
-        
+                
 
 
         if len(contours)> 0:
             bestContour = max(contours, key = cv2.contourArea)
             
             x, y, w, h = cv2.boundingRect(bestContour)
-            cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),3)
+            cv2.rectangle(frame,(x - CW,y - CW),( x + CW + w,y + CW + h ),(255,0,0),3)
 
-            #cropFrame = frame[y:y+h,x:x+w]
+            croppedSize = ( ( (y+CW+h )-(y-CW) ) * ( (x+CW+w)-(x-CW) ) )
+
+            if croppedSize < frameArea:
+                cropFrame = cleanFrame[ y-CW:(y+CW)+w , x-CW:(x+CW)+w ]
+            else:
+                print("You saved me!")
+                #banish to underdark
+                
+            
+            
+
+
+        else:
+            o=0
+            #send it to the shadow realm
 
         
         
@@ -115,12 +130,12 @@ while(True):
     
     
     cv2.imshow('video', frame)
-    cv2.imshow("Mask",frameResult)
+    #cv2.imshow("Mask",frameResult)
     cv2.imshow("Binary Image",binary)
-    #cv2.imshow("Image Threshold",frameThreshold)
-    #cv2.imshow("Cropped",cropFrame)
-    # creating 'q' as the quit 
-    # button for the video
+    cv2.imshow("Cropped",cropFrame)
+   
+   
+    # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
   
