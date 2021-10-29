@@ -9,15 +9,23 @@ cap = cv2.VideoCapture(0)
 color = (255,0,255)
 #Cropping Width
 CW = 25
-
-
+####################################################
+# Before turning write images on:
+#  Create folder "trainingData" in documents
+#  Create folder "neg, pos, maybe" in "trainingData"
+#  Check that you can read image from "trainingData"
+#####################################################
+path = "documents/trainingData/"
+numPos = 0
+numNeg = 0
+numMaybe = 0
 
 def empty(a):
     pass
 
 # Make trackbars
 cv2.namedWindow("Track Bars")
-cv2.resizeWindow("Track Bars", 1000,400)
+cv2.resizeWindow("Track Bars", 1000,500)
 cv2.createTrackbar("Hue Min","Track Bars",0,179,empty)
 cv2.createTrackbar("Hue Max","Track Bars",179,179,empty)
 cv2.createTrackbar("Saturation Min","Track Bars",0,255,empty)
@@ -28,6 +36,7 @@ cv2.createTrackbar("Number of Yellow Min","Track Bars",0,100000,empty)
 cv2.createTrackbar("Thresh Low", "Track Bars", 0 , 255, empty)
 cv2.createTrackbar("Thresh High", "Track Bars", 255 , 255, empty)
 cv2.createTrackbar("Exposure","Track Bars", -10,10, empty)
+cv2.createTrackbar("Collect Data?","Track Bars",0,1, empty)
 
 exposure = 0
 
@@ -62,9 +71,10 @@ while(True):
     BTLow = cv2.getTrackbarPos("Thresh Low", "Track Bars")
     BTHigh = cv2.getTrackbarPos("Thresh High", "Track Bars")
     exposure = cv2.getTrackbarPos("Exposure","Track Bars")
+    collectData = cv2.getTrackbarPos("Collect Data?","Track Bars")
     #print(h_min,h_max,s_min,s_max,v_min,v_max)
 
-    #Mask off fram  to see if there are any balls in scene (Used for sorting images)
+    #Mask off frame  to see if there are any balls in scene (Used for sorting images)
     lower = np.array([h_min,s_min,v_min])
     upper = np.array([h_max,s_max,v_max])
     frameMask = cv2.inRange(frameHSV,lower,upper)
@@ -95,10 +105,12 @@ while(True):
             cv2.rectangle(frame,(x - CW,y - CW),( x + CW + w,y + CW + h ),(255,0,0),3)
             
         else:
-            o=0
+            
             #Crop the frame to the full image and send it to "Maybe" folder
             cropFrame = frameClean[ 0:frame.shape[1], 0:frame.shape[0]]
-            #Insert write function here
+            if collectData == 1:
+                numMaybe = numMaybe + 1
+                cv2.imwrite(path + "maybe/Image_Maybe_" + str(numMaybe), cropFrame)
 
         #Set up dimentions of rectangle that will work with cropping
         if x-CW < 0:
@@ -112,13 +124,17 @@ while(True):
         
         #Do the croppping
         frameCrop = frameClean[x-CW:x+w+CW, y-CW:w+h+CW] 
-        #Insert write function here
+        if collectData == 1:
+                numPos = numPos + 1
+                cv2.imwrite(path + "pos/Image_Pos_" + str(numMaybe), cropFrame)
 
 
     else:
         ballInScene = False
         cropFrame = frameClean[ 0:frame.shape[1], 0:frame.shape[0]]
-        #Insert function to write to negatives folder
+        if collectData == 1:
+                numNeg = numNeg + 1
+                cv2.imwrite(path + "neg/Image_Neg_" + str(numMaybe), cropFrame)
     
     
     
