@@ -6,21 +6,16 @@ import time
 
 cap = cv2.VideoCapture(0)
 
-
-
-#soling error
-
-
 color = (255,0,255)
 #Cropping Width
 CW = 25
-# Make trackbars
+
 
 
 def empty(a):
     pass
 
-
+# Make trackbars
 cv2.namedWindow("Track Bars")
 cv2.resizeWindow("Track Bars", 1000,400)
 cv2.createTrackbar("Hue Min","Track Bars",0,179,empty)
@@ -51,11 +46,11 @@ while(True):
     
     
 
-  
+    #Convert image to grayscale
     frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     
-
+    #Get posision of trackbars and assign them to variables
     frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
     h_min = cv2.getTrackbarPos("Hue Min","Track Bars")
     h_max = cv2.getTrackbarPos("Hue Max","Track Bars")
@@ -69,6 +64,7 @@ while(True):
     exposure = cv2.getTrackbarPos("Exposure","Track Bars")
     #print(h_min,h_max,s_min,s_max,v_min,v_max)
 
+    #Mask off fram  to see if there are any balls in scene (Used for sorting images)
     lower = np.array([h_min,s_min,v_min])
     upper = np.array([h_max,s_max,v_max])
     frameMask = cv2.inRange(frameHSV,lower,upper)
