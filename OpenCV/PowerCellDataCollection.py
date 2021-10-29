@@ -7,6 +7,7 @@ import time
 cap = cv2.VideoCapture(0)
 
 
+
 #soling error
 
 
@@ -48,8 +49,7 @@ while(True):
     # Get image area
     frameArea = frame.shape[0] * frame.shape[1]
     
-
-
+    
 
   
     frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -104,13 +104,53 @@ while(True):
             croppedSize = ( ( (y+CW+h )-(y-CW) ) * ( (x+CW+w)-(x-CW) ) )
             
             #if ((y+CW+h)-(y-CW)) < frame.shape[0] and ((x+CW+w)-(x-CW)) < frame.shape[1] and cv2.contourArea(bestContour) > 100 and # make sure that no point is going over edge of image:
-            if y-CW > 0 and x-CW > 0 and y+CW+h < frame.shape[0] and x+CW+w > frame.shape[1]:
-                cropFrame = cleanFrame[ y-CW:y+CW+w , x-CW:x+CW+w ]
+            if y-CW > 0 and x-CW > 0 and y+CW+h < frame.shape[0] and x+CW+w < frame.shape[1]:
+                cropFrame = cleanFrame[ x-CW:x+CW+w , y-CW:y+CW+h ]
                 print(cv2.contourArea(bestContour))
+            
             else:
-                print("You saved me!")
-                #banish to underdark
-                cropFrame = cv2.imread("OpenCV/resources/lambo.png")
+                
+                if x-CW < 0 and y-CW < 0 and x+CW+w>frame.shape[1] and y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ 0:frame.shape[1],0:frame.shape[0]]
+                    print("Debug 1")
+                elif x-CW < 0 and x+CW+w>frame.shape[1] and y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ 0:frame.shape[1], y-CW:frame.shape[0]]
+                    print("Debug 2")
+                elif x-CW < 0 and x+CW+w>frame.shape[1]:
+                    cropFrame = cleanFrame[ 0:frame.shape[1], y-CW:y+CW+h]
+                    print("Debug 3")
+                elif x-CW < 0 and y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ 0:frame.shape[1], y-CW,frame.shape[0]]
+                    print("Debug 4")
+                elif y-CW < 0 and x+CW+w>frame.shape[1] and y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ x-CW:frame.shape[1], 0:frame.shape[0]]
+                    print("Debug 5")
+                elif y-CW < 0 and x+CW+w>frame.shape[1]:
+                    cropFrame = cleanFrame[ x-CW:frame.shape[1], 0:y+CW+h]
+                    print("Debug 6")
+                elif y-CW < 0 and y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ x-CW:x+CW+w, 0:frame.shape[0]]
+                    print("Debug 7")
+
+                if y-CW < 0 and x-CW < 0:
+                    cropFrame = cleanFrame[ 0:x+CW+w , 0:y+CW+h]
+                    print("Debug 8")
+                elif x-CW < 0:
+                    cropFrame = cleanFrame[ 0:x+CW+w , y-CW:y+CW+h]
+                    print("Debug 9")
+                elif y-CW < 0:
+                    cropFrame = cleanFrame[ x-CW:x+CW+w , 0:y+CW+h]
+                    print("Debug 10")
+                
+                if x+CW+w>frame.shape[1] and y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ x-CW:frame.shape[1], y-CW:frame.shape[0]]
+                    print("Debug 11")
+                elif x+CW+w>frame.shape[1]:
+                    cropFrame = cleanFrame[ x-CW:frame.shape[1], y-CW:y+CW+h]
+                    print("Debug 12")
+                elif y+CW+h>frame.shape[0]:
+                    cropFrame = cleanFrame[ x-CW:x+CW+w, y-CW:frame.shape[0]]
+                    print("Debug 13")
                 
         else:
             o=0
