@@ -71,10 +71,7 @@ while(True):
     frameResult = cv2.bitwise_and(frame,frame,mask=frameMask)
     frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
 
-
-    #another test
-    frameThreshold = cv2.inRange(frameHSV,(h_min,s_min,v_min),(h_max,s_max,v_max))
-    
+    #See if there are any objects that are the right color in the scene (If after masking, the image is black, it will be saved as a negative)
     countYellow = cv2.countNonZero(frameMask)
     if countYellow > yellowThresh: #choose condition
         #print("Ball Detected")
@@ -86,27 +83,24 @@ while(True):
         inverted = cv2.bitwise_not(binary)
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
                 
-
+        #Draw a squigly line around the object
         cv2.drawContours(frame,contours,-1,(0,255,255),3)
                 
 
-
+        #If it finds any contours, it will draw a rectangle and crop to it
         if len(contours)> 0:
             bestContour = max(contours, key = cv2.contourArea)
             
             x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frame,(x - CW,y - CW),( x + CW + w,y + CW + h ),(255,0,0),3)
-
-            croppedSize = ( ( (y+CW+h )-(y-CW) ) * ( (x+CW+w)-(x-CW) ) )
             
-            #if ((y+CW+h)-(y-CW)) < frame.shape[0] and ((x+CW+w)-(x-CW)) < frame.shape[1] and cv2.contourArea(bestContour) > 100 and # make sure that no point is going over edge of image:
-            
-                
         else:
             o=0
-            #send it to the shadow realm
-            cropFrame = cv2.imread("OpenCV/resources/lambo.png")
-        
+            #Crop the frame to the full image and send it to "Maybe" folder
+            cropFrame = frameClean[ 0:frame.shape[1], 0:frame.shape[0]]
+            #Insert write function here
+
+        #Set up dimentions of rectangle that will work with cropping
         if x-CW < 0:
             x = CW
         if y-CW < 0:
@@ -115,23 +109,20 @@ while(True):
             w = frame.shape[1] - x - CW
         if y+CW+h > frame.shape[0]:
             h = frame.shape[0] - y - CW
-  
+        
+        #Do the croppping
         frameCrop = frameClean[x-CW:x+w+CW, y-CW:w+h+CW] 
+        #Insert write function here
 
 
     else:
         ballInScene = False
-        cropFrame = cv2.imread("OpenCV/resources/lambo.png")
+        cropFrame = frameClean[ 0:frame.shape[1], 0:frame.shape[0]]
+        #Insert function to write to negatives folder
     
     
     
-    
-    
-    
-    
-    
-    
-    
+    #Show the videos
     cv2.imshow('video', frame)
     #cv2.imshow("Mask",frameResult)
     cv2.imshow("Binary Image",binary)
