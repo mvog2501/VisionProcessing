@@ -11,14 +11,18 @@ color = (255,0,255)
 CW = 25
 ####################################################
 # Before turning write images on:
+# Check the name of your profile and set is as "profile"
 #  Create folder "trainingData" in documents
 #  Create folder "neg, pos, maybe" in "trainingData"
 #  Check that you can read image from "trainingData"
 #####################################################
-path = "documents/trainingData/"
+profile  = "Laptop 5"
+path = "C:/Users/" + profile +"/Documents/trainingData/"
+print(path)
 numPos = 0
 numNeg = 0
 numMaybe = 0
+
 
 def empty(a):
     pass
@@ -107,34 +111,36 @@ while(True):
         else:
             
             #Crop the frame to the full image and send it to "Maybe" folder
-            cropFrame = frameClean[ 0:frame.shape[1], 0:frame.shape[0]]
+            cropFrame = cleanFrame[ 0:frame.shape[0], 0:frame.shape[1]]
             if collectData == 1:
                 numMaybe = numMaybe + 1
-                cv2.imwrite(path + "maybe/Image_Maybe_" + str(numMaybe), cropFrame)
+                cv2.imwrite(path + "maybe/Image_Maybe_" + str(numMaybe) + ".png", cropFrame)
 
         #Set up dimentions of rectangle that will work with cropping
-        if x-CW < 0:
-            x = CW
+        
         if y-CW < 0:
             y = CW
-        if x+CW+w > frame.shape[1]:
-            w = frame.shape[1] - x - CW
         if y+CW+h > frame.shape[0]:
             h = frame.shape[0] - y - CW
+        if x+CW+w > frame.shape[1]:
+            w = frame.shape[1] - x - CW
+        if x-CW < 0:
+            x = CW
+        
         
         #Do the croppping
-        frameCrop = frameClean[x-CW:x+w+CW, y-CW:w+h+CW] 
+        cropFrame = cleanFrame[y-CW:y+h+CW, x-CW:x+w+CW] 
         if collectData == 1:
-                numPos = numPos + 1
-                cv2.imwrite(path + "pos/Image_Pos_" + str(numMaybe), cropFrame)
+                numPos += 1
+                cv2.imwrite(path + "pos/Image_Pos_" + str(numPos) + ".png", cropFrame)
 
 
     else:
         ballInScene = False
-        cropFrame = frameClean[ 0:frame.shape[1], 0:frame.shape[0]]
+        cropFrame = cleanFrame[ 0:frame.shape[0], 0:frame.shape[1]]
         if collectData == 1:
                 numNeg = numNeg + 1
-                cv2.imwrite(path + "neg/Image_Neg_" + str(numMaybe), cropFrame)
+                cv2.imwrite(path + "neg/Image_Neg_" + str(numNeg) + ".png", cropFrame)
     
     
     

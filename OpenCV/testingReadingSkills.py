@@ -1,7 +1,7 @@
 import cv2
 
-img = cv2.imread("opencvTesting/OpenCV/resources/circles.png")
-cv2.imread("resources/cards.jpg")
+img = cv2.imread("C:/Users/Laptop 5/Documents/trainingData/maybe/Lenna.png")
 
-cv2.imshow("Circles window", img)
-cv2.waitkey(0)
+
+cv2.imshow("Image", img)
+cv2.waitKey(0)
