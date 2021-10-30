@@ -23,7 +23,7 @@ numPos = 0
 numNeg = 0
 numMaybe = 0
 
-
+numPosShow = 0
 def empty(a):
     pass
 
@@ -107,6 +107,24 @@ while(True):
             
             x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frame,(x - CW,y - CW),( x + CW + w,y + CW + h ),(255,0,0),3)
+
+            #Set up dimentions of rectangle that will work with cropping
+            if y-CW < 0:
+                y = CW
+            if y+CW+h > frame.shape[0]:
+                h = frame.shape[0] - y - CW
+            if x+CW+w > frame.shape[1]:
+                w = frame.shape[1] - x - CW
+            if x-CW < 0:
+                x = CW
+
+            #Do the croppping
+            cropFrame = cleanFrame[y-CW:y+h+CW, x-CW:x+w+CW] 
+            if collectData == 1:
+                numPos += 1
+                if numPos % 5 == 0:
+                    numPosShow += 1
+                    cv2.imwrite(path + "pos/Image_Pos_" + str(numPosShow) + ".png", cropFrame)
             
         else:
             
@@ -116,23 +134,9 @@ while(True):
                 numMaybe = numMaybe + 1
                 cv2.imwrite(path + "maybe/Image_Maybe_" + str(numMaybe) + ".png", cropFrame)
 
-        #Set up dimentions of rectangle that will work with cropping
-        
-        if y-CW < 0:
-            y = CW
-        if y+CW+h > frame.shape[0]:
-            h = frame.shape[0] - y - CW
-        if x+CW+w > frame.shape[1]:
-            w = frame.shape[1] - x - CW
-        if x-CW < 0:
-            x = CW
         
         
-        #Do the croppping
-        cropFrame = cleanFrame[y-CW:y+h+CW, x-CW:x+w+CW] 
-        if collectData == 1:
-                numPos += 1
-                cv2.imwrite(path + "pos/Image_Pos_" + str(numPos) + ".png", cropFrame)
+        
 
 
     else:
