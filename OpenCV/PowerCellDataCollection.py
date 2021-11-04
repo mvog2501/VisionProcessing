@@ -6,6 +6,8 @@ import time
 
 cap = cv2.VideoCapture(0)
 
+f_length = definatelyDefined #Used "Focal_Length_Finder.py"
+
 color = (255,0,255)
 #Cropping Width
 CW = 25
@@ -108,6 +110,7 @@ while(True):
             x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frame,(x - CW,y - CW),( x + CW + w,y + CW + h ),(255,0,0),3)
 
+
             #Set up dimentions of rectangle that will work with cropping
             if y-CW < 0:
                 y = CW
@@ -134,7 +137,6 @@ while(True):
                 numMaybe = numMaybe + 1
                 cv2.imwrite(path + "maybe/Image_Maybe_" + str(numMaybe) + ".png", cropFrame)
 
-        
         
         
 
