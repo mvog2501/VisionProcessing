@@ -23,7 +23,7 @@ contours, hierarchy = cv2.findContours(canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_
 cv2.imshow("Canny", blurred)
 
 
-def getPixelsToDistance(objectWidth,objectHeight,x_1,x_2,y_1,y_2,distance):
+def getPixelsToDistance(objectWidth,objectHeight,image,distance):
     
     #Pixels to inches
     wPix = math.sqrt(math.pow(x_2-x_1,2) + math.pow(y_2-y_1,2))
