@@ -1,6 +1,9 @@
 import cv2
 import numpy as np
 
+objectWidth = 8.5
+objectHeight = 11
+
 #Define path
 path = "OpenCV/resources/Rectangle.jpg"
 image = cv2.imread(path)
@@ -13,6 +16,10 @@ canny = cv2.Canny(gray,30,150)
 contours, hierarchy = cv2.findContours(canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
 cv2.imshow("Canny", blurred)
+
+
+def getPixelsToDistance(objectWidth,objectHeight,width,height):
+    return
 
 if len(contours)>1:
     bestContour = max(contours, key = cv2.contourArea)

@@ -6,7 +6,8 @@ import time
 
 cap = cv2.VideoCapture(0)
 
-#f_length = definatelyDefined #Used "Focal_Length_Finder.py"
+# Used "Focal_Length_Finder.py"
+#f_length = definatelyDefined
 
 color = (255,0,255)
 #Cropping Width
