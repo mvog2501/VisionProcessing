@@ -29,7 +29,7 @@ def getPixelsToDistance(objectWidth,objectHeight,x_1,x_2,y_1,y_2,distance):
     wPix = math.sqrt(math.pow(x_2-x_1,2) + math.pow(y_2-y_1,2))
     multiplier = image.shape[1] / wPix
     inchesW = multiplier(objectWidth)
-    horFOV = math.degrees( math.atan( (1/2(inchesW))/distance ) )
+    horFOV = math.degrees( math.atan( (1/2(inchesW))/distance ) ) * 2
     
     return horFOV
 
