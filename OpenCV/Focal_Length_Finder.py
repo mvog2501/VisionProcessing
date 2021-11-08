@@ -1,8 +1,13 @@
 import cv2
 import numpy as np
+import math
 
 objectWidth = 8.5
 objectHeight = 11
+
+print("Distance to object")
+distance = input()
+print("Distance: " + distance + " in")
 
 #Define path
 path = "OpenCV/resources/Rectangle.jpg"
@@ -18,8 +23,15 @@ contours, hierarchy = cv2.findContours(canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_
 cv2.imshow("Canny", blurred)
 
 
-def getPixelsToDistance(objectWidth,objectHeight,width,height):
-    return
+def getPixelsToDistance(objectWidth,objectHeight,x_1,x_2,y_1,y_2,distance):
+    
+    #Pixels to inches
+    wPix = math.sqrt(math.pow(x_2-x_1,2) + math.pow(y_2-y_1,2))
+    multiplier = image.shape[1] / wPix
+    inchesW = multiplier(objectWidth)
+    horFOV = math.degrees( math.atan( (1/2(inchesW))/distance ) )
+    
+    return horFOV
 
 if len(contours)>1:
     bestContour = max(contours, key = cv2.contourArea)
