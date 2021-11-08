@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread("C:/Users/Laptop 5/Documents/trainingData/maybe/Lenna.png")
+img = cv2.imread("OpenCV/resources/Paper.jpg")
 
 
 cv2.imshow("Image", img)
