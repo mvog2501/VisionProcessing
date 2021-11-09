@@ -1,13 +1,14 @@
 import cv2
 import numpy as np
+import math
 
 class Vision:
 
-    exposure = 0
+    #exposure = 0
     color = (255,0,0)
 
 
-    def empty(self):
+    def empty(self,a):
         pass
     
     def __init__(self):
@@ -38,6 +39,7 @@ class Vision:
         v_max = cv2.getTrackbarPos("Value Max","Track Bars")
         BTLow = cv2.getTrackbarPos("Thresh Low", "Track Bars")
         BTHigh = cv2.getTrackbarPos("Thresh High", "Track Bars")
+        exposure = cv2.getTrackbarPos("Exposure",  "Track Bars")
 
         
         lower = np.array([h_min,s_min,v_min])
@@ -49,37 +51,41 @@ class Vision:
         frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
 
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
+        inverted = cv2.bitwise_not(binary)
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
                 
         #Draw a squigly line around the object
         cv2.drawContours(frame,contours,-1,(0,255,255),3)
                 
+        distance = None
 
         #Find a rectangle that fits around the ball (Thill will be used to find location)
         if len(contours)> 0:
             bestContour = max(contours, key = cv2.contourArea)
             
             x, y, w, h = cv2.boundingRect(bestContour)
-            cv2.rectangle(frame,(x,y),( x + w,y + h ),self.color,3)
+            cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
-            #Get distance to ball
-            centerBottom = (x + .5 * w,y+h)
+            #Get distance to ballq
 
-            ########################
-            BallW = "how many cm"
+<<<<<<< HEAD
+            ballW = 6 #Inches (Could be wrong)
+            horFOV = 45 #Degree
+=======
 
+>>>>>>> 9b4f4fa734e2bb1ebc5b14e14f629a1165832a1a
 
-            #Pixels to inches
+            frameInches = (frame.shape[1]/w)*ballW
 
+            distance = (.5 * frameInches)/math.tan(.5*horFOV)
 
-        distance = "Gotta define this"
-        location = "Need to define this one"
+            distance2 = (.5 * frame.shape[1])/math.tan(.5*horFOV)
+            nPos = (x + .5 * w) / frame.shape[1] * 2 - 1
+            angleToBall = math.degrees(math.atan2(nPos, distance2))
 
         cv2.imshow("Result",frameResult)
-        return(distance,location)
-
-
-
+        cv2.imshow("Binary",binary)
+        return(distance,angleToBall)
 
 
 
@@ -89,12 +95,13 @@ detectingBall = Vision()
 
 while True:
     # Capture frames in the video
-    cap.set(cv2.CAP_PROP_EXPOSURE,-  Vision.exposure)
+    cap.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
     ret, frame = cap.read()
     cleanFrame = frame.copy()
 
 
-    detectingBall.ballDetection(frame)
+    dist,locat = detectingBall.ballDetection(frame)
+    print(dist, locat)
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
