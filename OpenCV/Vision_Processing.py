@@ -66,12 +66,10 @@ class Vision:
             x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
-            #Get distance to ballq
-
-
+            #Get distance to ball
             ballW = 6 #Inches (Could be wrong)
             horFOV = 45 #Degree
-
+            ########################
 
             frameInches = (frame.shape[1]/w)*ballW
 
