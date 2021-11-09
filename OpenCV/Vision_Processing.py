@@ -56,12 +56,21 @@ class Vision:
         cv2.drawContours(frame,contours,-1,(0,255,255),3)
                 
 
-        #If it finds any contours, it will draw a rectangle and crop to it
+        #Find a rectangle that fits around the ball (Thill will be used to find location)
         if len(contours)> 0:
             bestContour = max(contours, key = cv2.contourArea)
             
             x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frame,(x,y),( x + w,y + h ),self.color,3)
+
+            #Get distance to ball
+            centerBottom = (x + .5 * w,y+h)
+
+            ########################
+            BallW = "how many cm"
+
+
+            #Pixels to inches
 
 
         distance = "Gotta define this"
@@ -69,6 +78,7 @@ class Vision:
 
         cv2.imshow("Result",frameResult)
         return(distance,location)
+
 
 
 
