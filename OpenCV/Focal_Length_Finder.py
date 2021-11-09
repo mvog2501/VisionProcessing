@@ -21,9 +21,12 @@ def getRectangle(path):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray,(5,5),0)
     canny = cv2.Canny(gray,30,150)
-    contours, hierarchy = cv2.findContours(canny,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-    cv2.imshow("Canny", blurred)
+    ret,binary = cv2.threshold(gray,100,255,cv2.THRESH_BINARY)
+
+    contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+    cv2.imshow("Canny", binary)
     color = (255,0,0)
 
     if len(contours)>1:
@@ -36,33 +39,40 @@ def getRectangle(path):
 
         point1 = box[0]
         point2 = box[1]
+        point3 = box[2]
 
         print("We got 'em")
         cv2.imshow("Image",image)
 
     else: print("Hmmm")
     
-    return(point1[0],point1[1],point2[0],point2[1])
+    return(point1[0],point1[1],point2[0],point2[1],point3[0],point3[1])
 
 
-def getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,distance,image):
+def getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,x3,y3,distance,image):
     
-    width = objectWidth
     #Pixels to inches
     wPix = math.sqrt(math.pow(x2-x1,2) + math.pow(y2-y1,2))
-    multiplier = image.shape[1] / wPix
-    inchesW = multiplier * objectWidth
+    hPix = math.sqrt(math.pow(x3-x2,2) + math.pow(y3-y2,2))
+    multiplierW = image.shape[1] / wPix
+    multiplierH = image.shape[0] / hPix
+    inchesW = multiplierW * objectWidth
+    inchesH = multiplierH * objectHeight
     horFOV = math.degrees( math.atan2( ( .5*inchesW ), int(distance) ) ) * 2
+    verFOV = math.degrees( math.atan2( ( .5*inchesH ), int(distance) ) ) * 2
     
-    return horFOV
+    return horFOV,verFOV
 
 
 
 image = cv2.imread(path)
 
-x1,x2,y1,y2 = getRectangle(path)
+x1,x2,y1,y2,x3,y3 = getRectangle(path)
 
-horizontalFOV = getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,distance,image)
+horizontalFOV,verticalFOV = getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,x3,y3,distance,image)
 print(horizontalFOV)
+print(verticalFOV)
+
+
 
 cv2.waitKey(0)
