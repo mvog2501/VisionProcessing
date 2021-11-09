@@ -66,9 +66,7 @@ class Vision:
             #Get distance to ball
             centerBottom = (x + .5 * w,y+h)
 
-            ########################
-            BallW = 6 #inches
-            ########################
+
 
 
             #Pixels to inches
