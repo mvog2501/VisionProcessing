@@ -68,12 +68,10 @@ class Vision:
 
             #Get distance to ballq
 
-<<<<<<< HEAD
+
             ballW = 6 #Inches (Could be wrong)
             horFOV = 45 #Degree
-=======
 
->>>>>>> 9b4f4fa734e2bb1ebc5b14e14f629a1165832a1a
 
             frameInches = (frame.shape[1]/w)*ballW
 
