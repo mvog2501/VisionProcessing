@@ -10,7 +10,7 @@ distance = input()
 print("Distance: " + distance + " in")
 
 #Define path
-path = "OpenCV/resources/Rectangle.jpg"
+path = "OpenCV/resources/PaperPic.jpg"
 
 
 
@@ -34,36 +34,35 @@ def getRectangle(path):
         box = np.int0(box)
         cv2.drawContours(image, [box], 0, color)
 
-        x_1 = box[0]
-        x_2 = box[3]
-        y_1 = box[1]
-        y_2 = box[2]
+        point1 = box[0]
+        point2 = box[1]
 
         print("We got 'em")
-        print(x_2)
+        cv2.imshow("Image",image)
 
     else: print("Hmmm")
     
-    return(x_1[0],x_2[0])
+    return(point1[0],point1[1],point2[0],point2[1])
 
 
-def getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,distance):
+def getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,distance,image):
     
+    width = objectWidth
     #Pixels to inches
-    wPix = math.sqrt(math.pow(x_2-x_1,2) + math.pow(y_2-y_1,2))
+    wPix = math.sqrt(math.pow(x2-x1,2) + math.pow(y2-y1,2))
     multiplier = image.shape[1] / wPix
-    inchesW = multiplier(objectWidth)
-    horFOV = math.degrees( math.atan( (1/2(inchesW))/distance ) ) * 2
+    inchesW = multiplier * objectWidth
+    horFOV = math.degrees( math.atan2( ( .5*inchesW ), int(distance) ) ) * 2
     
     return horFOV
 
 
 
+image = cv2.imread(path)
 
+x1,x2,y1,y2 = getRectangle(path)
 
-x1,x2 = getRectangle(path)
-
-print(x2)
-
+horizontalFOV = getPixelsToDistance(objectWidth,objectHeight,x1,x2,y1,y2,distance,image)
+print(horizontalFOV)
 
 cv2.waitKey(0)
