@@ -17,12 +17,14 @@ path = "OpenCV/resources/PaperPic.jpg"
 
 def getRectangle(path):
     image = cv2.imread(path)
-
+    imageHSV = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray,(5,5),0)
     canny = cv2.Canny(gray,30,150)
 
-    ret,binary = cv2.threshold(gray,100,255,cv2.THRESH_BINARY)
+    frameMask = cv2.inRange(imageHSV,(0,0,100),(255,20,250))
+
+    ret,binary = cv2.threshold(frameMask,100,255,cv2.THRESH_BINARY)
 
     contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 

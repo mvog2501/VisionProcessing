@@ -49,7 +49,6 @@ class Vision:
         frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
 
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
-        inverted = cv2.bitwise_not(binary)
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
                 
         #Draw a squigly line around the object
