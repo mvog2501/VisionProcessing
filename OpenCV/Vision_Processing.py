@@ -58,6 +58,7 @@ class Vision:
         cv2.drawContours(frame,contours,-1,(0,255,255),3)
                 
         distance = None
+        angleToBall = None
 
         #Find a rectangle that fits around the ball (Thill will be used to find location)
         if len(contours)> 0:
@@ -75,9 +76,7 @@ class Vision:
 
             distance = (.5 * frameInches)/math.tan(.5*horFOV)
 
-            distance2 = (.5 * frame.shape[1])/math.tan(.5*horFOV)
-            nPos = (x + .5 * w) / frame.shape[1] * 2 - 1
-            angleToBall = math.degrees(math.atan2(nPos, distance2))
+            angleToBall = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
 
         cv2.imshow("Result",frameResult)
         cv2.imshow("Binary",binary)
