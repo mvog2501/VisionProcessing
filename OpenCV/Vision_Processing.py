@@ -77,7 +77,7 @@ class Vision:
             distance = (.5 * frameInches)/math.tan(.5*horFOV)
 
             angle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
-            angleToBall = angle * (horFOV / 90)
+            angleToBall = angle * (.5 * horFOV / 90)
 
         cv2.imshow("Result",frameResult)
         cv2.imshow("Binary",binary)
