@@ -83,7 +83,60 @@ class Vision:
         cv2.imshow("Binary",binary)
         return(distance,angleToBall)
 
+    def visionTargetAngle(self,targetFrame):
+        #Get posision of trackbars and assign them to variables
+        h_min = cv2.getTrackbarPos("Hue Min","Track Bars")
+        h_max = cv2.getTrackbarPos("Hue Max","Track Bars")
+        s_min = cv2.getTrackbarPos("Saturation Min","Track Bars")
+        s_max = cv2.getTrackbarPos("Saturation Max","Track Bars")
+        v_min = cv2.getTrackbarPos("Value Min","Track Bars")
+        v_max = cv2.getTrackbarPos("Value Max","Track Bars")
+        BTLow = cv2.getTrackbarPos("Thresh Low", "Track Bars")
+        BTHigh = cv2.getTrackbarPos("Thresh High", "Track Bars")
+        exposure = cv2.getTrackbarPos("Exposure",  "Track Bars")
 
+        
+        lower = np.array([h_min,s_min,v_min])
+        upper = np.array([h_max,s_max,v_max])
+        frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+        frameGray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+        frameMask = cv2.inRange(frameHSV,lower,upper)
+        frameResult = cv2.bitwise_and(frame,frame,mask=frameMask)
+        frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
+
+        ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
+        inverted = cv2.bitwise_not(binary)
+        contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+                
+        #Draw a squigly line around the object
+        cv2.drawContours(frame,contours,-1,(0,255,255),3)
+                
+        distance = None
+        horAngle = None
+        verAngle = None
+
+        #Find a rectangle that fits around the ball (Thill will be used to find location)
+        if len(contours)> 0:
+            bestContour = max(contours, key = cv2.contourArea)
+            
+            x, y, w, h = cv2.boundingRect(bestContour)
+            cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
+
+            #Get distance to ball
+            targetW = 34 #Inches
+            horFOV = 45 #Degrees
+            verFOV = 24 #Degrees
+            ########################
+
+            
+
+            frameInches = (frame.shape[1]/w)*targetW
+
+            distance = (.5 * frameInches)/math.tan(.5*horFOV)
+
+            angle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
+            angleToBall = angle * (.5 * horFOV / 90)        
+        return(distance,horAngle,verAngle)
 
 cap = cv2.VideoCapture(0)
 
