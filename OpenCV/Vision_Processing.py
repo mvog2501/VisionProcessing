@@ -98,10 +98,10 @@ class Vision:
         
         lower = np.array([h_min,s_min,v_min])
         upper = np.array([h_max,s_max,v_max])
-        frameHSV = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
-        frameGray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+        frameHSV = cv2.cvtColor(targetFrame,cv2.COLOR_BGR2HSV)
+        frameGray = cv2.cvtColor(targetFrame,cv2.COLOR_BGR2GRAY)
         frameMask = cv2.inRange(frameHSV,lower,upper)
-        frameResult = cv2.bitwise_and(frame,frame,mask=frameMask)
+        frameResult = cv2.bitwise_and(targetFrame,targetFrame,mask=frameMask)
         frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
 
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
@@ -109,7 +109,7 @@ class Vision:
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
                 
         #Draw a squigly line around the object
-        cv2.drawContours(frame,contours,-1,(0,255,255),3)
+        cv2.drawContours(targetFrame,contours,-1,(0,255,255),3)
                 
         distance = None
         horAngle = None
@@ -123,19 +123,24 @@ class Vision:
             cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
             #Get distance to ball
-            targetW = 34 #Inches
+            targetW = 39.25 #Inches
+            targetH = 17 #Inches
             horFOV = 45 #Degrees
             verFOV = 24 #Degrees
             ########################
 
+            frameInches = frame.shape[0]/h*targetH
+
+            distance = (.5 * frameInches)/math.tan(.5*verFOV)
+
+            # pointA = (x+int(.5*w),y)
+            #pointB = (x+int(.5*w),y+h)
+            #cv2.line(frameMask,pointA,pointB,(0,0,0),3)
             
 
-            frameInches = (frame.shape[1]/w)*targetW
-
-            distance = (.5 * frameInches)/math.tan(.5*horFOV)
-
-            angle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
-            angleToBall = angle * (.5 * horFOV / 90)        
+        cv2.imshow("Result",frameResult)
+        cv2.imshow("Binary",binary)
+        cv2.imshow("Frame mask",frameMask)
         return(distance,horAngle,verAngle)
 
 cap = cv2.VideoCapture(0)
@@ -147,10 +152,14 @@ while True:
     cap.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
     ret, frame = cap.read()
     cleanFrame = frame.copy()
+    targetFrame = frame.copy()
+    cv2.imshow("Target Frame", targetFrame)
 
 
-    dist,locat = detectingBall.ballDetection(frame)
-    print(dist, locat)
+    #dist,locat = detectingBall.ballDetection(frame)
+    #print(dist, locat)
+
+    visionTarget = detectingBall.visionTargetAngle(targetFrame)
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -59,6 +59,7 @@ while(True):
 
     # Get image area
     frameArea = frame.shape[0] * frame.shape[1]
+    print(frame.shape[1])
     
     
 
