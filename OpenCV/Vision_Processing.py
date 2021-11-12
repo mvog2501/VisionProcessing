@@ -133,6 +133,10 @@ class Vision:
 
             distance = (.5 * frameInches)/math.tan(.5*verFOV)
 
+            localYAngle = math.degrees(math.atan2(-(.5*frame.shape[0]-(y+h)),distance))
+            localXAngle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
+
+
             # pointA = (x+int(.5*w),y)
             #pointB = (x+int(.5*w),y+h)
             #cv2.line(frameMask,pointA,pointB,(0,0,0),3)
@@ -141,11 +145,11 @@ class Vision:
         cv2.imshow("Result",frameResult)
         cv2.imshow("Binary",binary)
         cv2.imshow("Frame mask",frameMask)
-        return(distance,horAngle,verAngle)
+        return(distance,localXAngle,localYAngle)
 
 cap = cv2.VideoCapture(0)
 
-detectingBall = Vision()
+vision = Vision()
 
 while True:
     # Capture frames in the video
@@ -159,7 +163,9 @@ while True:
     #dist,locat = detectingBall.ballDetection(frame)
     #print(dist, locat)
 
-    visionTarget = detectingBall.visionTargetAngle(targetFrame)
+    visionTarget = vision.visionTargetAngle(targetFrame)
+
+    print(visionTarget[0])
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
