@@ -68,13 +68,14 @@ class Vision:
             cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
             #Get distance to ball
-            ballW = 6 #Inches (Could be wrong)
-            horFOV = 45 #Degree
+            ballW = 7 #Inches (Could be wrong)
+            #horFOV = 45 #Degree
+            horFOV = 68 # Logi c615
             ########################
 
             frameInches = (frame.shape[1]/w)*ballW
 
-            distance = (.5 * frameInches)/math.tan(.5*horFOV)
+            distance = -((.5 * frameInches)/math.tan(.5*horFOV))
 
             angle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
             angleToBall = angle * (.5 * horFOV / 90)
@@ -126,7 +127,8 @@ class Vision:
             targetW = 39.25 #Inches
             targetH = 17 #Inches
             horFOV = 45 #Degrees
-            verFOV = 24 #Degrees
+            #verFOV = 24 #Degrees
+            verFOV = 40 #Logi c615
             ########################
 
             frameInches = frame.shape[0]/h*targetH
@@ -163,9 +165,11 @@ while True:
     #dist,locat = detectingBall.ballDetection(frame)
     #print(dist, locat)
 
-    visionTarget = vision.visionTargetAngle(targetFrame)
+    #visionTarget = vision.visionTargetAngle(targetFrame)
+    ball = vision.ballDetection(frame)
+    print(ball[0])
 
-    print(visionTarget[0])
+    #print(visionTarget[0])
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
