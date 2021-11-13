@@ -68,7 +68,7 @@ class Vision:
             cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
             #Get distance to ball
-            ballW = 6 #Inches (Could be wrong)
+            ballW = 7 #Inches (Could be wrong)
             horFOV = 45 #Degree
             ########################
 
@@ -160,6 +160,7 @@ while True:
     #print(dist, locat)
 
     visionTarget = detectingBall.visionTargetAngle(targetFrame)
+    print("Distance:   " + str(visionTarget[0]))
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
