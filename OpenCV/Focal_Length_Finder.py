@@ -10,7 +10,7 @@ distance = input()
 print("Distance: " + distance + " in")
 
 #Define path
-path = "OpenCV/resources/PaperPic.jpg"
+path = "OpenCV/resources/Logi.jpg"
 
 
 
@@ -22,7 +22,7 @@ def getRectangle(path):
     blurred = cv2.GaussianBlur(gray,(5,5),0)
     canny = cv2.Canny(gray,30,150)
 
-    frameMask = cv2.inRange(imageHSV,(0,0,100),(255,20,250))
+    frameMask = cv2.inRange(imageHSV,(150,0,0),(255,150,250))
 
     ret,binary = cv2.threshold(frameMask,100,255,cv2.THRESH_BINARY)
 
