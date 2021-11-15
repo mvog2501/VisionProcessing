@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 class Vision:
-
+    print("vision is running")
     #exposure = 0
     color = (255,0,0)
 
@@ -59,6 +59,7 @@ class Vision:
                 
         distance = None
         angleToBall = None
+        w = None
 
         #Find a rectangle that fits around the ball (Thill will be used to find location)
         if len(contours)> 0:
@@ -75,15 +76,18 @@ class Vision:
             frameInches = (frame.shape[1]/w)*ballW
 
             distance = (.5 * frameInches)/math.tan(.5*horFOV)
+            #distance = 148.638*.9881**w
 
             angle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
             angleToBall = angle * (.5 * horFOV / 90)
 
         cv2.imshow("Result",frameResult)
         cv2.imshow("Binary",binary)
-        return(distance,angleToBall)
+        return(distance,angleToBall,w)
 
     def visionTargetAngle(self,targetFrame):
+
+
         #Get posision of trackbars and assign them to variables
         h_min = cv2.getTrackbarPos("Hue Min","Track Bars")
         h_max = cv2.getTrackbarPos("Hue Max","Track Bars")
@@ -112,8 +116,8 @@ class Vision:
         cv2.drawContours(targetFrame,contours,-1,(0,255,255),3)
                 
         distance = None
-        horAngle = None
-        verAngle = None
+        localXAngle = None
+        localYAngle = None
 
         #Find a rectangle that fits around the ball (Thill will be used to find location)
         if len(contours)> 0:
@@ -162,9 +166,7 @@ while True:
 
     #dist,locat = detectingBall.ballDetection(frame)
     #print(dist, locat)
-
-    visionTarget = vision.visionTargetAngle(targetFrame)
-
+    visionTarget = vision.ballDetection(frame)
     print(visionTarget[0])
 
     # creating 'q' as the quit button for the video
