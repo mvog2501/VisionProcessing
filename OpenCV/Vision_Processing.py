@@ -75,8 +75,8 @@ class Vision:
 
             frameInches = (frame.shape[1]/w)*ballW
 
-            distance = (.5 * frameInches)/math.tan(.5*horFOV)
-            #distance = 148.638*.9881**w
+            #distance = (.5 * frameInches)/math.tan(.5*horFOV) #Old way using FOV and tangent.
+            distance = 148.638*.9881**w
 
             angle = math.degrees(math.atan2(-(.5*frame.shape[1]-(x+.5*w)),distance))
             angleToBall = angle * (.5 * horFOV / 90)
