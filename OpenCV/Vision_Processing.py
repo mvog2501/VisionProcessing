@@ -69,7 +69,7 @@ class Vision:
             cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
             #Get distance to ball
-            ballW = 6 #Inches (Could be wrong)
+            ballW = 7 #Inches (Could be wrong)
             horFOV = 45 #Degree
             ########################
 
@@ -150,6 +150,13 @@ class Vision:
         cv2.imshow("Binary",binary)
         cv2.imshow("Frame mask",frameMask)
         return(distance,localXAngle,localYAngle)
+    
+    
+    def Visualizer(self, estPose):
+        #Create a visualizer to see where it thinks the robot/ball is
+        visualizer = np.zeros((500,500,3),np.uint8)
+        cv2.imshow("Visualizer",visualizer)
+        
 
 cap = cv2.VideoCapture(0)
 
@@ -168,6 +175,7 @@ while True:
     #print(dist, locat)
     visionTarget = vision.ballDetection(frame)
     print(visionTarget[0])
+    vision.Visualizer(None)
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
