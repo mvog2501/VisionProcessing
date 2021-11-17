@@ -1,9 +1,9 @@
 import cv2
 import numpy as np
 import math
+import glob
 
 class Vision:
-    print("vision is running")
     #exposure = 0
     color = (255,0,0)
 
@@ -12,6 +12,7 @@ class Vision:
         pass
     
     def __init__(self):
+
         # Make trackbars
         cv2.namedWindow("Track Bars")
         cv2.resizeWindow("Track Bars", 1000,500)
@@ -26,7 +27,62 @@ class Vision:
         cv2.createTrackbar("Thresh High", "Track Bars", 255 , 255, self.empty)
         cv2.createTrackbar("Exposure","Track Bars", -10,10, self.empty)
         cv2.createTrackbar("Collect Data?","Track Bars",0,1, self.empty)
+
+        
+    #Calibrate Camera
+    def calibrateCameraInit(self):
+        checkerboard = (6,9)#size
+        criteria = (cv2.TermCriteria_EPS + cv2.TermCriteria_MAX_ITER, 30, 0.001)
+
+        #Create a vecotr to store vecots of 3D points for each checkerboard image
+        objpoints = []
+        #Vector to store 2D points
+        imgpoints = []
+
+        objp = np.zeros((1, checkerboard[0] * checkerboard[1], 3), np.float32)
+        objp[0,:,:2] = np.mgrid[0:checkerboard[0],0:checkerboard[1]].T.reshape(-1,2)
+
+        images = glob.glob('OpenCV/checkerboards/*.jpg')
+        for fname in images:
+            img = cv2.imread(fname)
+            gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+            #Find the corners
+            ret, corners = cv2.findChessboardCorners(gray,checkerboard,cv2.CALIB_CB_ADAPTIVE_THRESH + cv2.CALIB_CB_FAST_CHECK + cv2.CALIB_CB_NORMALIZE_IMAGE)
+            #If criterion is met, refine the corners
+            if ret == True:
+                objpoints.append(objp)
+                corners2 = cv2.cornerSubPix(gray, corners, (11,11),(-1,-1),criteria)
+
+                imgpoints.append(corners2)
+                
+
+                img = cv2.drawChessboardCorners(img, checkerboard,corners2,ret)
+
+        h,w = img.shape[:2]
+
+        ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
+
+        newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+
+        dst = cv2.undistort(img,mtx,dist,None,newcameramtx)
+
+        x,y,w,h = roi
+        dst = dst[y:y+h,x:x+w]
+
+
+
+        return(mtx,dist,newcameramtx,roi)
     
+    def calibrateCamera(self,cam1,cam2,mtx,dist,newcameramtx,roi):
+        undestoredCam1 = cv2.undistort(cam1,mtx,dist,None,newcameramtx)
+        undestoredCam2 = cv2.undistort(cam2,mtx,dist,None,newcameramtx)
+
+        x,y,w,h = roi
+        undestoredCam1 = undestoredCam1[y:y+h,x:x+w]
+        undestoredCam2 = undestoredCam2[y:y+h,x:x+w]
+        return(undestoredCam1,undestoredCam2)
+
+
     # Find a ball using color and get it's properties
     def ballDetection(self,frame):
         
@@ -159,13 +215,26 @@ class Vision:
         
 
 cap = cv2.VideoCapture(0)
+capL = cv2.VideoCapture(2)
+capR = cv2.VideoCapture(1)
+
+#Set properties of cameras
+capL.set(cv2.CAP_PROP_AUTO_WB,0)
+capR.set(cv2.CAP_PROP_AUTO_WB,0)
+capL.set(cv2.CAP_PROP_AUTOFOCUS,0)
+capR.set(cv2.CAP_PROP_AUTOFOCUS,0)
 
 vision = Vision()
+cal = vision.calibrateCameraInit()
 
 while True:
     # Capture frames in the video
     cap.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
+    capL.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
+    capR.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
     ret, frame = cap.read()
+    ret, frameL = capL.read()
+    ret, frameR = capR.read()
     cleanFrame = frame.copy()
     targetFrame = frame.copy()
     cv2.imshow("Target Frame", targetFrame)
@@ -173,10 +242,12 @@ while True:
 
     #dist,locat = detectingBall.ballDetection(frame)
     #print(dist, locat)
-    visionTarget = vision.ballDetection(frame)
-    print(visionTarget[0])
-    vision.Visualizer(None)
-
+    #visionTarget = vision.ballDetection(frame)
+    #print(visionTarget[0])
+    #vision.Visualizer(None)
+    sCamL,sCamR = vision.calibrateCamera(frameL,frameR,cal[0],cal[1],cal[2],cal[3])
+    cv2.imshow("Left Camera",sCamL)
+    cv2.imshow("Right Camera",sCamR)
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
@@ -185,6 +256,3 @@ while True:
 cap.release()
 # close all windows
 cv2.destroyAllWindows()
-
-
-

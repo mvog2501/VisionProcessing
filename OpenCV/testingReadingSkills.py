@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread("OpenCV/resources/Logi.jpg")
+img = cv2.imread("OpenCV/checkerboards/chessy.png")
 
 
 cv2.imshow("Image", img)
