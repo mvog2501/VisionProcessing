@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import math
 import glob
+import taskclient as tc
+
+client = tc.TaskMessenger("localhost", 8264, "Vision_Prosessing")
 
 class Vision:
     #exposure = 0
@@ -195,7 +198,7 @@ class Vision:
             #Get distance to ball
             targetW = 39.25 #Inches
             targetH = 17 #Inches
-            horFOV = 45 #Degrees
+            horFOV = self.alpha #Degrees
             verFOV = 24 #Degrees
             ########################
 
@@ -245,14 +248,14 @@ class Vision:
         cv2.imshow("Visualizer",visualizer)
 
 cap = cv2.VideoCapture(0)
-capL = cv2.VideoCapture(2)
-capR = cv2.VideoCapture(1)
+#capL = cv2.VideoCapture(2)
+#capR = cv2.VideoCapture(1)
 
 #Set properties of cameras
-capL.set(cv2.CAP_PROP_AUTO_WB,0)
-capR.set(cv2.CAP_PROP_AUTO_WB,0)
-capL.set(cv2.CAP_PROP_AUTOFOCUS,0)
-capR.set(cv2.CAP_PROP_AUTOFOCUS,0)
+#capL.set(cv2.CAP_PROP_AUTO_WB,0)
+#capR.set(cv2.CAP_PROP_AUTO_WB,0)
+#capL.set(cv2.CAP_PROP_AUTOFOCUS,0)
+#capR.set(cv2.CAP_PROP_AUTOFOCUS,0)
 
 vision = Vision()
 cal = vision.calibrateCameraInit()
@@ -260,11 +263,11 @@ cal = vision.calibrateCameraInit()
 while True:
     # Capture frames in the video
     cap.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
-    capL.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
-    capR.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
+    #capL.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
+    #capR.set(cv2.CAP_PROP_EXPOSURE,-  cv2.getTrackbarPos("Exposure",  "Track Bars"))
     ret, frame = cap.read()
-    ret, frameL = capL.read()
-    ret, frameR = capR.read()
+    # ret, frameL = capL.read()
+    # ret, frameR = capR.read()
     cleanFrame = frame.copy()
     targetFrame = frame.copy()
     cv2.imshow("Target Frame", targetFrame)
@@ -275,18 +278,19 @@ while True:
     #visionTarget = vision.ballDetection(frame)
     #print(visionTarget[0])
     #vision.Visualizer(None)
-    sCamL,sCamR = vision.calibrateCamera(frameL,frameR,cal[0],cal[1],cal[2],cal[3])
-    cv2.imshow("Left Camera",sCamL)
-    cv2.imshow("Right Camera",sCamR)
+    #sCamL,sCamR = vision.calibrateCamera(frameL,frameR,cal[0],cal[1],cal[2],cal[3])
+    calCam, calCam = vision.calibrateCamera(frame,frame,cal[0],cal[1],cal[2],cal[3])
+    # cv2.imshow("Left Camera",sCamL)
+    # cv2.imshow("Right Camera",sCamR)
 
 
-    leftMask = vision.ballDetection(sCamL)[3]
-    rightMask = vision.ballDetection(sCamR)[3]
-    centerL = vision.ballDetection(sCamL)[4]
-    centerR = vision.ballDetection(sCamR)[4]
+    # leftMask = vision.ballDetection(sCamL)[3]
+    # rightMask = vision.ballDetection(sCamR)[3]
+    # centerL = vision.ballDetection(sCamL)[4]
+    # centerR = vision.ballDetection(sCamR)[4]
 
     #Run stereo vision
-    vision.stereoVision(leftMask,rightMask,centerL,centerR)
+    #vision.stereoVision(leftMask,rightMask,centerL,centerR)
 
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
