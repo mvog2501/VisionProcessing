@@ -7,6 +7,14 @@ class Vision:
     #exposure = 0
     color = (255,0,0)
 
+    frame_rate = 120
+
+    baseline = 7.62 #Distance between cameras in centimeters
+    focalLength = 10 #Focal length in millimeters
+    alpha = 59.7 #Horizontal fov in degrees
+
+    count = -1
+
 
     def empty(self,a):
         pass
@@ -105,7 +113,7 @@ class Vision:
         frameMask = cv2.inRange(frameHSV,lower,upper)
         frameResult = cv2.bitwise_and(frame,frame,mask=frameMask)
         frameGrayMask = cv2.bitwise_and(frameGray,frameGray, mask=frameMask)
-
+        colorMask = frameResult.copy()
         ret,binary = cv2.threshold(frameGrayMask,BTLow,BTHigh,cv2.THRESH_BINARY)
         inverted = cv2.bitwise_not(binary)
         contours, hierarchy = cv2.findContours(binary,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
@@ -124,6 +132,8 @@ class Vision:
             x, y, w, h = cv2.boundingRect(bestContour)
             cv2.rectangle(frameResult,(x,y),( x + w,y + h ),self.color,3)
 
+            center = (x+.5*w,y+.5*h)
+
             #Get distance to ball
             ballW = 7 #Inches (Could be wrong)
             horFOV = 45 #Degree
@@ -139,7 +149,7 @@ class Vision:
 
         cv2.imshow("Result",frameResult)
         cv2.imshow("Binary",binary)
-        return(distance,angleToBall,w)
+        return(distance,angleToBall,w,colorMask,center)
 
     def visionTargetAngle(self,targetFrame):
 
@@ -207,12 +217,32 @@ class Vision:
         cv2.imshow("Frame mask",frameMask)
         return(distance,localXAngle,localYAngle)
     
-    
+    def stereoVision(self,frameLeft,frameRight,centerL,centerR):
+        self.count +=1
+
+        heightLeft, widthLeft, depthLeft = frameLeft.shape
+        heightRight, widthRight, depthRight = frameRight.shape
+        
+        if widthRight == widthLeft:
+            f_pixel = (widthRight*.5)/math.tan(self.alpha * .5 * math.pi/180)
+        else: raise Exception("Cameras have differnt pixel widths")
+
+        x_right = centerL[0]
+        x_left = centerR[0]
+
+        #calculate disparity
+        disparity = x_left-x_right
+        
+        zDepth = (self.baseline*f_pixel)/(disparity+.001)
+        print(zDepth)
+        
+        return()
+        
     def Visualizer(self, estPose):
+
         #Create a visualizer to see where it thinks the robot/ball is
         visualizer = np.zeros((500,500,3),np.uint8)
         cv2.imshow("Visualizer",visualizer)
-        
 
 cap = cv2.VideoCapture(0)
 capL = cv2.VideoCapture(2)
@@ -248,6 +278,16 @@ while True:
     sCamL,sCamR = vision.calibrateCamera(frameL,frameR,cal[0],cal[1],cal[2],cal[3])
     cv2.imshow("Left Camera",sCamL)
     cv2.imshow("Right Camera",sCamR)
+
+
+    leftMask = vision.ballDetection(sCamL)[3]
+    rightMask = vision.ballDetection(sCamR)[3]
+    centerL = vision.ballDetection(sCamL)[4]
+    centerR = vision.ballDetection(sCamR)[4]
+
+    #Run stereo vision
+    vision.stereoVision(leftMask,rightMask,centerL,centerR)
+
     # creating 'q' as the quit button for the video
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
